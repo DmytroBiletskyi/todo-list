@@ -7,19 +7,25 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import prettierConfig from 'eslint-config-prettier';
 
 export default defineConfig([
-  globalIgnores(['dist', 'node_modules']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
-    ],
-    languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
-    },
-  },
-  prettierConfig,
+	globalIgnores(['dist', 'node_modules']),
+	prettierConfig,
+	{
+		files: ['**/*.{ts,tsx}'],
+		extends: [
+			js.configs.recommended,
+			tseslint.configs.recommended,
+			reactHooks.configs.flat.recommended,
+			reactRefresh.configs.vite
+		],
+		languageOptions: {
+			ecmaVersion: 2020,
+			globals: globals.browser
+		},
+		rules: {
+			curly: ['error', 'all'],
+			'no-unused-vars': 'off',
+			'@typescript-eslint/no-unused-vars': 'error',
+			'react-refresh/only-export-components': 'off'
+		}
+	}
 ]);

@@ -1,0 +1,49 @@
+.card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 10px 12px;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-sm);
+	transition:
+		box-shadow var(--transition-fast),
+		border-color var(--transition-fast);
+}
+
+.card:hover {
+	box-shadow: var(--shadow-sm);
+	border-color: var(--color-primary);
+}
+
+.text {
+	font-size: 0.875rem;
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.deleteBtn {
+	flex-shrink: 0;
+	width: 24px;
+	height: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--radius-sm);
+	font-size: 0.75rem;
+	color: var(--color-text-secondary);
+	opacity: 0;
+	transition: all var(--transition-fast);
+}
+
+.card:hover .deleteBtn {
+	opacity: 1;
+}
+
+.deleteBtn:hover {
+	color: var(--color-danger);
+	background: #fef2f2;
+}

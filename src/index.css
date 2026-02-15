@@ -1,51 +1,51 @@
 :root {
-  --color-bg: #f0f2f5;
-  --color-surface: #ffffff;
-  --color-primary: #4f46e5;
-  --color-primary-hover: #4338ca;
-  --color-danger: #ef4444;
-  --color-danger-hover: #dc2626;
-  --color-success: #22c55e;
-  --color-text: #1e293b;
-  --color-text-secondary: #64748b;
-  --color-text-completed: #94a3b8;
-  --color-border: #e2e8f0;
-  --color-drag-overlay: rgba(79, 70, 229, 0.08);
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --transition-fast: 150ms ease;
-  --transition-normal: 250ms ease;
-  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	--color-bg: #f0f2f5;
+	--color-surface: #ffffff;
+	--color-primary: #4f46e5;
+	--color-primary-hover: #4338ca;
+	--color-danger: #ef4444;
+	--color-danger-hover: #dc2626;
+	--color-success: #22c55e;
+	--color-text: #1e293b;
+	--color-text-secondary: #64748b;
+	--color-text-completed: #94a3b8;
+	--color-border: #e2e8f0;
+	--color-drag-overlay: rgba(79, 70, 229, 0.08);
+	--radius-sm: 6px;
+	--radius-md: 10px;
+	--radius-lg: 14px;
+	--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+	--transition-fast: 150ms ease;
+	--transition-normal: 250ms ease;
+	--font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
 }
 
 body {
-  font-family: var(--font-family);
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+	font-family: var(--font-family);
+	background-color: var(--color-bg);
+	color: var(--color-text);
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
 }
 
 button {
-  cursor: pointer;
-  border: none;
-  background: none;
-  font-family: inherit;
-  font-size: inherit;
+	cursor: pointer;
+	border: none;
+	background: none;
+	font-family: inherit;
+	font-size: inherit;
 }
 
 input {
-  font-family: inherit;
-  font-size: inherit;
+	font-family: inherit;
+	font-size: inherit;
 }
