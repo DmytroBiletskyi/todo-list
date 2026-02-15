@@ -17,6 +17,48 @@
 	border-color: var(--color-primary);
 }
 
+.completed {
+	opacity: 0.6;
+}
+
+.completed .text {
+	text-decoration: line-through;
+	color: var(--color-text-completed);
+}
+
+.left {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex: 1;
+	min-width: 0;
+}
+
+.toggleBtn {
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	border: 2px solid var(--color-border);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 0.7rem;
+	flex-shrink: 0;
+	transition: all var(--transition-fast);
+	color: transparent;
+	background: transparent;
+}
+
+.toggleBtn:hover {
+	border-color: var(--color-success);
+}
+
+.toggleCompleted {
+	background: var(--color-success);
+	border-color: var(--color-success);
+	color: white;
+}
+
 .text {
 	font-size: 0.875rem;
 	flex: 1;
@@ -25,25 +67,41 @@
 	text-overflow: ellipsis;
 }
 
-.deleteBtn {
-	flex-shrink: 0;
-	width: 24px;
-	height: 24px;
+.editInput {
+	flex: 1;
+	border: 1px solid var(--color-primary);
+	border-radius: var(--radius-sm);
+	padding: 2px 6px;
+	font-size: 0.875rem;
+	outline: none;
+	background: var(--color-surface);
+	color: var(--color-text);
+}
+
+.right {
+	display: flex;
+	gap: 2px;
+	opacity: 0;
+	transition: opacity var(--transition-fast);
+}
+
+.card:hover .right {
+	opacity: 1;
+}
+
+.actionBtn {
+	width: 26px;
+	height: 26px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	border-radius: var(--radius-sm);
 	font-size: 0.75rem;
 	color: var(--color-text-secondary);
-	opacity: 0;
 	transition: all var(--transition-fast);
 }
 
-.card:hover .deleteBtn {
-	opacity: 1;
-}
-
-.deleteBtn:hover {
-	color: var(--color-danger);
+.actionBtn:hover {
 	background: #fef2f2;
+	color: var(--color-danger);
 }

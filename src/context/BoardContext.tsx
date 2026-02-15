@@ -7,6 +7,8 @@ interface BoardContextType {
 	state: BoardState;
 	addTask: (columnId: string, text: string) => void;
 	deleteTask: (taskId: string) => void;
+	editTask: (taskId: string, text: string) => void;
+	toggleTask: (taskId: string) => void;
 	addColumn: (title: string) => void;
 	deleteColumn: (columnId: string) => void;
 	editColumn: (columnId: string, title: string) => void;
@@ -89,6 +91,39 @@ export function BoardProvider({ children }: { children: React.ReactNode }) {
 		[setState]
 	);
 
+	const editTask = useCallback(
+		(taskId: string, text: string) => {
+			const trimmed = text.trim();
+			if (!trimmed) {
+				return;
+			}
+			setState((prev) => ({
+				...prev,
+				tasks: {
+					...prev.tasks,
+					[taskId]: { ...prev.tasks[taskId], text: trimmed }
+				}
+			}));
+		},
+		[setState]
+	);
+
+	const toggleTask = useCallback(
+		(taskId: string) => {
+			setState((prev) => ({
+				...prev,
+				tasks: {
+					...prev.tasks,
+					[taskId]: {
+						...prev.tasks[taskId],
+						completed: !prev.tasks[taskId].completed
+					}
+				}
+			}));
+		},
+		[setState]
+	);
+
 	const addColumn = useCallback(
 		(title: string) => {
 			const trimmed = title.trim();
@@ -160,11 +195,13 @@ export function BoardProvider({ children }: { children: React.ReactNode }) {
 			state,
 			addTask,
 			deleteTask,
+			editTask,
+			toggleTask,
 			addColumn,
 			deleteColumn,
 			editColumn
 		}),
-		[state, addTask, deleteTask, addColumn, deleteColumn, editColumn]
+		[state, addTask, deleteTask, editTask, toggleTask, addColumn, deleteColumn, editColumn]
 	);
 
 	return <BoardContext.Provider value={value}>{children}</BoardContext.Provider>;
