@@ -7,6 +7,9 @@ interface BoardContextType {
 	state: BoardState;
 	addTask: (columnId: string, text: string) => void;
 	deleteTask: (taskId: string) => void;
+	addColumn: (title: string) => void;
+	deleteColumn: (columnId: string) => void;
+	editColumn: (columnId: string, title: string) => void;
 }
 
 const BoardContext = createContext<BoardContextType | null>(null);
@@ -86,13 +89,82 @@ export function BoardProvider({ children }: { children: React.ReactNode }) {
 		[setState]
 	);
 
+	const addColumn = useCallback(
+		(title: string) => {
+			const trimmed = title.trim();
+			if (!trimmed) {
+				return;
+			}
+
+			const columnId = crypto.randomUUID();
+
+			setState((prev) => ({
+				...prev,
+				columns: {
+					...prev.columns,
+					[columnId]: { id: columnId, title: trimmed, taskIds: [] }
+				},
+				columnOrder: [...prev.columnOrder, columnId]
+			}));
+		},
+		[setState]
+	);
+
+	const deleteColumn = useCallback(
+		(columnId: string) => {
+			setState((prev) => {
+				const column = prev.columns[columnId];
+				if (!column) {
+					return prev;
+				}
+
+				const remainingTasks = { ...prev.tasks };
+				for (const taskId of column.taskIds) {
+					delete remainingTasks[taskId];
+				}
+
+				const remainingColumns = { ...prev.columns };
+				delete remainingColumns[columnId];
+
+				return {
+					...prev,
+					tasks: remainingTasks,
+					columns: remainingColumns,
+					columnOrder: prev.columnOrder.filter((id) => id !== columnId)
+				};
+			});
+		},
+		[setState]
+	);
+
+	const editColumn = useCallback(
+		(columnId: string, title: string) => {
+			const trimmed = title.trim();
+			if (!trimmed) {
+				return;
+			}
+
+			setState((prev) => ({
+				...prev,
+				columns: {
+					...prev.columns,
+					[columnId]: { ...prev.columns[columnId], title: trimmed }
+				}
+			}));
+		},
+		[setState]
+	);
+
 	const value = useMemo<BoardContextType>(
 		() => ({
 			state,
 			addTask,
-			deleteTask
+			deleteTask,
+			addColumn,
+			deleteColumn,
+			editColumn
 		}),
-		[state, addTask, deleteTask]
+		[state, addTask, deleteTask, addColumn, deleteColumn, editColumn]
 	);
 
 	return <BoardContext.Provider value={value}>{children}</BoardContext.Provider>;

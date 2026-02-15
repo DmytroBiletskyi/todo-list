@@ -8,7 +8,6 @@ import prettierConfig from 'eslint-config-prettier';
 
 export default defineConfig([
 	globalIgnores(['dist', 'node_modules']),
-	prettierConfig,
 	{
 		files: ['**/*.{ts,tsx}'],
 		extends: [
@@ -27,5 +26,6 @@ export default defineConfig([
 			'@typescript-eslint/no-unused-vars': 'error',
 			'react-refresh/only-export-components': 'off'
 		}
-	}
+	},
+	prettierConfig
 ]);

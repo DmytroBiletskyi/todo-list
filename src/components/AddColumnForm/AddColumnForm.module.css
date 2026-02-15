@@ -1,0 +1,91 @@
+.addButton {
+	min-width: 240px;
+	padding: 16px;
+	border-radius: var(--radius-lg);
+	background: rgba(0, 0, 0, 0.04);
+	border: 2px dashed var(--color-border);
+	color: var(--color-text-secondary);
+	font-size: 0.9rem;
+	font-weight: 600;
+	transition: all var(--transition-fast);
+	flex-shrink: 0;
+	height: fit-content;
+}
+
+.addButton:hover {
+	border-color: var(--color-primary);
+	color: var(--color-primary);
+	background: rgba(79, 70, 229, 0.04);
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	min-width: 240px;
+	padding: 16px;
+	background: var(--color-bg);
+	border-radius: var(--radius-lg);
+	flex-shrink: 0;
+	height: fit-content;
+}
+
+.input {
+	padding: 8px 10px;
+	border: 1px solid var(--color-primary);
+	border-radius: var(--radius-sm);
+	font-size: 0.875rem;
+	outline: none;
+	background: var(--color-surface);
+	color: var(--color-text);
+}
+
+.input::placeholder {
+	color: var(--color-text-secondary);
+}
+
+.actions {
+	display: flex;
+	gap: 6px;
+}
+
+.submit {
+	padding: 8px 14px;
+	background: var(--color-primary);
+	color: white;
+	border-radius: var(--radius-sm);
+	font-size: 0.813rem;
+	font-weight: 600;
+	transition: background var(--transition-fast);
+}
+
+.submit:hover:not(:disabled) {
+	background: var(--color-primary-hover);
+}
+
+.submit:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.cancel {
+	padding: 8px 10px;
+	color: var(--color-text-secondary);
+	font-size: 0.875rem;
+	border-radius: var(--radius-sm);
+	transition: color var(--transition-fast);
+}
+
+.cancel:hover {
+	color: var(--color-danger);
+}
+
+@media (max-width: 768px) {
+	.addButton {
+		min-width: 100%;
+	}
+
+	.form {
+		min-width: 100%;
+	}
+}

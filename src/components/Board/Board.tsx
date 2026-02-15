@@ -1,5 +1,6 @@
 import { useBoardContext } from '../../context/BoardContext';
 import { Column } from '../Column/Column';
+import { AddColumnForm } from '../AddColumnForm/AddColumnForm';
 import styles from './Board.module.css';
 
 export function Board() {
@@ -10,6 +11,7 @@ export function Board() {
 			{state.columnOrder.map((columnId) => (
 				<Column key={columnId} columnId={columnId} />
 			))}
+			<AddColumnForm />
 		</div>
 	);
 }
