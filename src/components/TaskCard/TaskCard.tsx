@@ -1,18 +1,27 @@
 import { useState, useRef, useEffect } from 'react';
+import { draggable, dropTargetForElements } from '@atlaskit/pragmatic-drag-and-drop/element/adapter';
+import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import { useBoardContext } from '../../context/BoardContext';
 import styles from './TaskCard.module.css';
 
 interface TaskCardProps {
 	taskId: string;
+	index: number;
+	columnId: string;
 }
 
-export function TaskCard({ taskId }: TaskCardProps) {
-	const { state, deleteTask, toggleTask, editTask } = useBoardContext();
+export function TaskCard({ taskId, index, columnId }: TaskCardProps) {
+	const { state, deleteTask, toggleTask, editTask, selectedTaskIds, toggleTaskSelection } =
+		useBoardContext();
 	const task = state.tasks[taskId];
 
 	const [isEditing, setIsEditing] = useState(false);
 	const [editText, setEditText] = useState('');
 	const inputRef = useRef<HTMLInputElement>(null);
+
+	const cardRef = useRef<HTMLDivElement>(null);
+	const [isDragging, setIsDragging] = useState(false);
+	const [isDraggedOver, setIsDraggedOver] = useState(false);
 
 	useEffect(() => {
 		if (isEditing) {
@@ -20,6 +29,32 @@ export function TaskCard({ taskId }: TaskCardProps) {
 			inputRef.current?.select();
 		}
 	}, [isEditing]);
+
+	useEffect(() => {
+		const el = cardRef.current;
+		if (!el) {
+			return;
+		}
+
+		return combine(
+			draggable({
+				element: el,
+				getInitialData: () => ({ type: 'task', taskId, columnId, index }),
+				onDragStart: () => setIsDragging(true),
+				onDrop: () => setIsDragging(false),
+			}),
+			dropTargetForElements({
+				element: el,
+				getData: () => ({ type: 'task', taskId, columnId, index }),
+				canDrop: ({ source }) => source.data.type === 'task' && source.data.taskId !== taskId,
+				onDragEnter: () => setIsDraggedOver(true),
+				onDragLeave: () => setIsDraggedOver(false),
+				onDrop: () => setIsDraggedOver(false),
+			}),
+		);
+	}, [taskId, columnId, index]);
+
+	const isSelected = selectedTaskIds.has(taskId);
 
 	if (!task) {
 		return null;
@@ -38,11 +73,26 @@ export function TaskCard({ taskId }: TaskCardProps) {
 		setIsEditing(false);
 	};
 
-	const cardClassName = [styles.card, task.completed ? styles.completed : ''].filter(Boolean).join(' ');
+	const cardClassName = [
+		styles.card,
+		task.completed ? styles.completed : '',
+		isSelected ? styles.selected : '',
+		isDragging ? styles.dragging : '',
+		isDraggedOver ? styles.draggedOver : '',
+	]
+		.filter(Boolean)
+		.join(' ');
 
 	return (
-		<div className={cardClassName}>
+		<div ref={cardRef} className={cardClassName}>
 			<div className={styles.left}>
+				<input
+					type="checkbox"
+					className={styles.selectCheckbox}
+					checked={isSelected}
+					onChange={() => toggleTaskSelection(taskId)}
+					title="Select task"
+				/>
 				<button
 					className={`${styles.toggleBtn} ${task.completed ? styles.toggleCompleted : ''}`}
 					onClick={() => toggleTask(taskId)}

@@ -1,4 +1,4 @@
-import { createContext, useContext, useCallback, useMemo } from 'react';
+import { createContext, useContext, useCallback, useMemo, useState } from 'react';
 import type { BoardState } from '../types';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { DEFAULT_BOARD_STATE, LOCAL_STORAGE_KEY } from '../constants';
@@ -9,14 +9,24 @@ interface BoardContextType {
 	deleteTask: (taskId: string) => void;
 	editTask: (taskId: string, text: string) => void;
 	toggleTask: (taskId: string) => void;
+
 	addColumn: (title: string) => void;
 	deleteColumn: (columnId: string) => void;
 	editColumn: (columnId: string, title: string) => void;
+
+	moveTaskToColumn: (taskId: string, targetColumnId: string, targetIndex?: number) => void;
+	reorderTask: (columnId: string, startIndex: number, endIndex: number) => void;
+	reorderColumn: (startIndex: number, endIndex: number) => void;
+
+	selectedTaskIds: Set<string>;
+	toggleTaskSelection: (taskId: string) => void;
+	selectAllInColumn: (columnId: string) => void;
+	deselectAll: () => void;
+	isAllSelectedInColumn: (columnId: string) => boolean;
 }
 
 const BoardContext = createContext<BoardContextType | null>(null);
 
-// TODO: separate the useBoardContext hook from the BoardProvider component
 export function useBoardContext(): BoardContextType {
 	const context = useContext(BoardContext);
 
@@ -29,6 +39,8 @@ export function useBoardContext(): BoardContextType {
 
 export function BoardProvider({ children }: { children: React.ReactNode }) {
 	const [state, setState] = useLocalStorage<BoardState>(LOCAL_STORAGE_KEY, DEFAULT_BOARD_STATE);
+	const [searchQuery, setSearchQuery] = useState('');
+	const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
 
 	const addTask = useCallback(
 		(columnId: string, text: string) => {
@@ -86,6 +98,14 @@ export function BoardProvider({ children }: { children: React.ReactNode }) {
 						}
 					}
 				};
+			});
+			setSelectedTaskIds((prev) => {
+				if (!prev.has(taskId)) {
+					return prev;
+				}
+				const next = new Set(prev);
+				next.delete(taskId);
+				return next;
 			});
 		},
 		[setState]
@@ -168,6 +188,7 @@ export function BoardProvider({ children }: { children: React.ReactNode }) {
 					columnOrder: prev.columnOrder.filter((id) => id !== columnId)
 				};
 			});
+			setSelectedTaskIds(new Set());
 		},
 		[setState]
 	);
@@ -190,6 +211,134 @@ export function BoardProvider({ children }: { children: React.ReactNode }) {
 		[setState]
 	);
 
+	const moveTaskToColumn = useCallback(
+		(taskId: string, targetColumnId: string, targetIndex?: number) => {
+			setState((prev) => {
+				const task = prev.tasks[taskId];
+				if (!task) {
+					return prev;
+				}
+
+				const sourceColumnId = task.columnId;
+				const sourceColumn = prev.columns[sourceColumnId];
+				const targetColumn = prev.columns[targetColumnId];
+
+				const newSourceTaskIds = sourceColumn.taskIds.filter((id) => id !== taskId);
+
+				let newTargetTaskIds: string[];
+				if (sourceColumnId === targetColumnId) {
+					newTargetTaskIds = newSourceTaskIds;
+				} else {
+					newTargetTaskIds = [...targetColumn.taskIds];
+				}
+
+				const insertAt = targetIndex !== undefined ? targetIndex : newTargetTaskIds.length;
+				newTargetTaskIds.splice(insertAt, 0, taskId);
+
+				return {
+					...prev,
+					tasks: {
+						...prev.tasks,
+						[taskId]: { ...task, columnId: targetColumnId }
+					},
+					columns: {
+						...prev.columns,
+						[sourceColumnId]: { ...sourceColumn, taskIds: newSourceTaskIds },
+						[targetColumnId]: {
+							...(sourceColumnId === targetColumnId ? sourceColumn : targetColumn),
+							taskIds: newTargetTaskIds
+						}
+					}
+				};
+			});
+		},
+		[setState]
+	);
+
+	const reorderTask = useCallback(
+		(columnId: string, startIndex: number, endIndex: number) => {
+			setState((prev) => {
+				const column = prev.columns[columnId];
+				const newTaskIds = [...column.taskIds];
+				const [removed] = newTaskIds.splice(startIndex, 1);
+				newTaskIds.splice(endIndex, 0, removed);
+
+				return {
+					...prev,
+					columns: {
+						...prev.columns,
+						[columnId]: { ...column, taskIds: newTaskIds }
+					}
+				};
+			});
+		},
+		[setState]
+	);
+
+	const reorderColumn = useCallback(
+		(startIndex: number, endIndex: number) => {
+			setState((prev) => {
+				const newOrder = [...prev.columnOrder];
+				const [removed] = newOrder.splice(startIndex, 1);
+				newOrder.splice(endIndex, 0, removed);
+				return { ...prev, columnOrder: newOrder };
+			});
+		},
+		[setState]
+	);
+
+	const toggleTaskSelection = useCallback((taskId: string) => {
+		setSelectedTaskIds((prev) => {
+			const next = new Set(prev);
+			if (next.has(taskId)) {
+				next.delete(taskId);
+			} else {
+				next.add(taskId);
+			}
+			return next;
+		});
+	}, []);
+
+	const selectAllInColumn = useCallback(
+		(columnId: string) => {
+			const column = state.columns[columnId];
+			if (!column) {
+				return;
+			}
+
+			setSelectedTaskIds((prev) => {
+				const allSelected = column.taskIds.length > 0 && column.taskIds.every((id) => prev.has(id));
+				const next = new Set(prev);
+				if (allSelected) {
+					for (const id of column.taskIds) {
+						next.delete(id);
+					}
+				} else {
+					for (const id of column.taskIds) {
+						next.add(id);
+					}
+				}
+				return next;
+			});
+		},
+		[state.columns]
+	);
+
+	const deselectAll = useCallback(() => {
+		setSelectedTaskIds(new Set());
+	}, []);
+
+	const isAllSelectedInColumn = useCallback(
+		(columnId: string) => {
+			const column = state.columns[columnId];
+			if (!column || column.taskIds.length === 0) {
+				return false;
+			}
+			return column.taskIds.every((id) => selectedTaskIds.has(id));
+		},
+		[state.columns, selectedTaskIds]
+	);
+
 	const value = useMemo<BoardContextType>(
 		() => ({
 			state,
@@ -197,11 +346,42 @@ export function BoardProvider({ children }: { children: React.ReactNode }) {
 			deleteTask,
 			editTask,
 			toggleTask,
+
 			addColumn,
 			deleteColumn,
-			editColumn
+			editColumn,
+
+			moveTaskToColumn,
+			reorderTask,
+			reorderColumn,
+
+			selectedTaskIds,
+			toggleTaskSelection,
+			selectAllInColumn,
+			deselectAll,
+			isAllSelectedInColumn
 		}),
-		[state, addTask, deleteTask, editTask, toggleTask, addColumn, deleteColumn, editColumn]
+		[
+			state,
+			addTask,
+			deleteTask,
+			editTask,
+			toggleTask,
+
+			addColumn,
+			deleteColumn,
+			editColumn,
+
+			moveTaskToColumn,
+			reorderTask,
+			reorderColumn,
+
+			selectedTaskIds,
+			toggleTaskSelection,
+			selectAllInColumn,
+			deselectAll,
+			isAllSelectedInColumn
+		]
 	);
 
 	return <BoardContext.Provider value={value}>{children}</BoardContext.Provider>;
