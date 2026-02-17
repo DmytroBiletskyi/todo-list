@@ -28,6 +28,10 @@ interface BoardContextType {
 	selectAllInColumn: (columnId: string) => void;
 	deselectAll: () => void;
 	isAllSelectedInColumn: (columnId: string) => boolean;
+
+	bulkDeleteTasks: (taskIds: string[]) => void;
+	bulkToggleTasks: (taskIds: string[], completed: boolean) => void;
+	bulkMoveTasks: (taskIds: string[], targetColumnId: string) => void;
 }
 
 const BoardContext = createContext<BoardContextType | null>(null);
@@ -345,6 +349,77 @@ export function BoardProvider({ children }: { children: React.ReactNode }) {
 		[state.columns, selectedTaskIds]
 	);
 
+	const bulkDeleteTasks = useCallback(
+		(taskIds: string[]) => {
+			setState((prev) => {
+				const remainingTasks = { ...prev.tasks };
+				const updatedColumns = { ...prev.columns };
+
+				for (const taskId of taskIds) {
+					const task = remainingTasks[taskId];
+					if (task) {
+						updatedColumns[task.columnId] = {
+							...updatedColumns[task.columnId],
+							taskIds: updatedColumns[task.columnId].taskIds.filter((id) => id !== taskId)
+						};
+						delete remainingTasks[taskId];
+					}
+				}
+
+				return { ...prev, tasks: remainingTasks, columns: updatedColumns };
+			});
+			setSelectedTaskIds(new Set());
+		},
+		[setState]
+	);
+
+	const bulkToggleTasks = useCallback(
+		(taskIds: string[], completed: boolean) => {
+			setState((prev) => {
+				const updatedTasks = { ...prev.tasks };
+				for (const taskId of taskIds) {
+					if (updatedTasks[taskId]) {
+						updatedTasks[taskId] = { ...updatedTasks[taskId], completed };
+					}
+				}
+				return { ...prev, tasks: updatedTasks };
+			});
+		},
+		[setState]
+	);
+
+	const bulkMoveTasks = useCallback(
+		(taskIds: string[], targetColumnId: string) => {
+			setState((prev) => {
+				const updatedTasks = { ...prev.tasks };
+				const updatedColumns = { ...prev.columns };
+
+				for (const taskId of taskIds) {
+					const task = updatedTasks[taskId];
+					if (!task || task.columnId === targetColumnId) {
+						continue;
+					}
+
+					updatedColumns[task.columnId] = {
+						...updatedColumns[task.columnId],
+						taskIds: updatedColumns[task.columnId].taskIds.filter((id) => id !== taskId)
+					};
+
+					updatedColumns[targetColumnId] = {
+						...updatedColumns[targetColumnId],
+						taskIds: [...updatedColumns[targetColumnId].taskIds, taskId]
+					};
+
+					updatedTasks[taskId] = { ...task, columnId: targetColumnId };
+				}
+
+				return { ...prev, tasks: updatedTasks, columns: updatedColumns };
+			});
+			setSelectedTaskIds(new Set());
+		},
+		[setState]
+	);
+
 	const value = useMemo<BoardContextType>(
 		() => ({
 			state,
@@ -370,7 +445,11 @@ export function BoardProvider({ children }: { children: React.ReactNode }) {
 			toggleTaskSelection,
 			selectAllInColumn,
 			deselectAll,
-			isAllSelectedInColumn
+			isAllSelectedInColumn,
+
+			bulkDeleteTasks,
+			bulkToggleTasks,
+			bulkMoveTasks
 		}),
 		[
 			state,
@@ -394,7 +473,11 @@ export function BoardProvider({ children }: { children: React.ReactNode }) {
 			toggleTaskSelection,
 			selectAllInColumn,
 			deselectAll,
-			isAllSelectedInColumn
+			isAllSelectedInColumn,
+
+			bulkDeleteTasks,
+			bulkToggleTasks,
+			bulkMoveTasks
 		]
 	);
 

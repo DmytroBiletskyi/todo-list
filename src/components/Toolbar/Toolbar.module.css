@@ -1,0 +1,97 @@
+.toolbar {
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	background: var(--color-text);
+	color: white;
+	padding: 12px 20px;
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-md);
+	z-index: 100;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.count {
+	font-weight: 600;
+	font-size: 0.875rem;
+	white-space: nowrap;
+}
+
+.actions {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.btn {
+	padding: 6px 12px;
+	border-radius: var(--radius-sm);
+	background: rgba(255, 255, 255, 0.15);
+	color: white;
+	font-size: 0.8rem;
+	font-weight: 500;
+	transition: background var(--transition-fast);
+}
+
+.btn:hover {
+	background: rgba(255, 255, 255, 0.25);
+}
+
+.btn:disabled {
+	opacity: 0.4;
+	cursor: not-allowed;
+}
+
+.danger {
+	background: var(--color-danger);
+}
+
+.danger:hover {
+	background: var(--color-danger-hover);
+}
+
+.btnGhost {
+	padding: 6px 12px;
+	color: rgba(255, 255, 255, 0.7);
+	font-size: 0.8rem;
+	transition: color var(--transition-fast);
+}
+
+.btnGhost:hover {
+	color: white;
+}
+
+.moveGroup {
+	display: flex;
+	gap: 4px;
+	align-items: center;
+}
+
+.select {
+	padding: 4px 8px;
+	border-radius: var(--radius-sm);
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	background: rgba(255, 255, 255, 0.1);
+	color: white;
+	font-size: 0.8rem;
+	font-family: inherit;
+}
+
+.select option {
+	color: var(--color-text);
+}
+
+@media (max-width: 600px) {
+	.toolbar {
+		bottom: 12px;
+		left: 12px;
+		right: 12px;
+		transform: none;
+	}
+}
