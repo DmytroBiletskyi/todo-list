@@ -17,3 +17,5 @@ export interface BoardState {
 	columns: Record<string, Column>;
 	columnOrder: string[];
 }
+
+export type FilterStatus = 'all' | 'completed' | 'incomplete';

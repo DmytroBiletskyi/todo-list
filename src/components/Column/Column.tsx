@@ -4,6 +4,7 @@ import { combine } from '@atlaskit/pragmatic-drag-and-drop/combine';
 import { useBoardContext } from '../../context/BoardContext';
 import { TaskCard } from '../TaskCard/TaskCard';
 import { AddTaskForm } from '../AddTaskForm/AddTaskForm';
+import { filterTasks } from '../../utils/board';
 import styles from './Column.module.css';
 
 interface ColumnProps {
@@ -12,7 +13,16 @@ interface ColumnProps {
 }
 
 export function Column({ columnId, index }: ColumnProps) {
-	const { state, addTask, deleteColumn, editColumn, selectAllInColumn, isAllSelectedInColumn } = useBoardContext();
+	const {
+		state,
+		addTask,
+		deleteColumn,
+		editColumn,
+		searchQuery,
+		filterStatus,
+		selectAllInColumn,
+		isAllSelectedInColumn
+	} = useBoardContext();
 	const column = state.columns[columnId];
 
 	const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -81,6 +91,7 @@ export function Column({ columnId, index }: ColumnProps) {
 		}
 	};
 
+	const filteredTaskIds = filterTasks(column.taskIds, state.tasks, searchQuery, filterStatus);
 	const allSelected = isAllSelectedInColumn(columnId);
 
 	const columnClassName = [styles.column, isDragging ? styles.dragging : '', isOver ? styles.over : '']
@@ -112,6 +123,7 @@ export function Column({ columnId, index }: ColumnProps) {
 							{column.title}
 						</h3>
 					)}
+					<span className={styles.count}>{filteredTaskIds.length}</span>
 				</div>
 				<div className={styles.headerRight}>
 					<label className={styles.selectAll}>
@@ -130,9 +142,9 @@ export function Column({ columnId, index }: ColumnProps) {
 			</div>
 
 			<div className={styles.taskList}>
-				{column.taskIds.length === 0 && <p className={styles.empty}>No tasks yet</p>}
-				{column.taskIds.map((taskId) => (
-					<TaskCard key={taskId} taskId={taskId} index={index} columnId={columnId} />
+				{filteredTaskIds.length === 0 && <p className={styles.empty}>No tasks yet</p>}
+				{filteredTaskIds.map((taskId, idx) => (
+					<TaskCard key={taskId} taskId={taskId} index={idx} columnId={columnId} />
 				))}
 			</div>
 

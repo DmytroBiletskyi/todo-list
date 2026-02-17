@@ -11,8 +11,7 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ taskId, index, columnId }: TaskCardProps) {
-	const { state, deleteTask, toggleTask, editTask, selectedTaskIds, toggleTaskSelection } =
-		useBoardContext();
+	const { state, deleteTask, toggleTask, editTask, selectedTaskIds, toggleTaskSelection } = useBoardContext();
 	const task = state.tasks[taskId];
 
 	const [isEditing, setIsEditing] = useState(false);
@@ -41,7 +40,7 @@ export function TaskCard({ taskId, index, columnId }: TaskCardProps) {
 				element: el,
 				getInitialData: () => ({ type: 'task', taskId, columnId, index }),
 				onDragStart: () => setIsDragging(true),
-				onDrop: () => setIsDragging(false),
+				onDrop: () => setIsDragging(false)
 			}),
 			dropTargetForElements({
 				element: el,
@@ -49,8 +48,8 @@ export function TaskCard({ taskId, index, columnId }: TaskCardProps) {
 				canDrop: ({ source }) => source.data.type === 'task' && source.data.taskId !== taskId,
 				onDragEnter: () => setIsDraggedOver(true),
 				onDragLeave: () => setIsDraggedOver(false),
-				onDrop: () => setIsDraggedOver(false),
-			}),
+				onDrop: () => setIsDraggedOver(false)
+			})
 		);
 	}, [taskId, columnId, index]);
 
@@ -78,7 +77,7 @@ export function TaskCard({ taskId, index, columnId }: TaskCardProps) {
 		task.completed ? styles.completed : '',
 		isSelected ? styles.selected : '',
 		isDragging ? styles.dragging : '',
-		isDraggedOver ? styles.draggedOver : '',
+		isDraggedOver ? styles.draggedOver : ''
 	]
 		.filter(Boolean)
 		.join(' ');

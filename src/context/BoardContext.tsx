@@ -1,5 +1,5 @@
 import { createContext, useContext, useCallback, useMemo, useState } from 'react';
-import type { BoardState } from '../types';
+import type { BoardState, FilterStatus } from '../types';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { DEFAULT_BOARD_STATE, LOCAL_STORAGE_KEY } from '../constants';
 
@@ -17,6 +17,11 @@ interface BoardContextType {
 	moveTaskToColumn: (taskId: string, targetColumnId: string, targetIndex?: number) => void;
 	reorderTask: (columnId: string, startIndex: number, endIndex: number) => void;
 	reorderColumn: (startIndex: number, endIndex: number) => void;
+
+	searchQuery: string;
+	setSearchQuery: (query: string) => void;
+	filterStatus: FilterStatus;
+	setFilterStatus: (status: FilterStatus) => void;
 
 	selectedTaskIds: Set<string>;
 	toggleTaskSelection: (taskId: string) => void;
@@ -40,6 +45,7 @@ export function useBoardContext(): BoardContextType {
 export function BoardProvider({ children }: { children: React.ReactNode }) {
 	const [state, setState] = useLocalStorage<BoardState>(LOCAL_STORAGE_KEY, DEFAULT_BOARD_STATE);
 	const [searchQuery, setSearchQuery] = useState('');
+	const [filterStatus, setFilterStatus] = useState<FilterStatus>('all');
 	const [selectedTaskIds, setSelectedTaskIds] = useState<Set<string>>(new Set());
 
 	const addTask = useCallback(
@@ -355,6 +361,11 @@ export function BoardProvider({ children }: { children: React.ReactNode }) {
 			reorderTask,
 			reorderColumn,
 
+			searchQuery,
+			setSearchQuery,
+			filterStatus,
+			setFilterStatus,
+
 			selectedTaskIds,
 			toggleTaskSelection,
 			selectAllInColumn,
@@ -375,6 +386,9 @@ export function BoardProvider({ children }: { children: React.ReactNode }) {
 			moveTaskToColumn,
 			reorderTask,
 			reorderColumn,
+
+			searchQuery,
+			filterStatus,
 
 			selectedTaskIds,
 			toggleTaskSelection,
