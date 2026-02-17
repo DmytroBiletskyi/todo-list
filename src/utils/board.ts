@@ -18,6 +18,7 @@ export function filterTasks(
 			return false;
 		}
 
+		// TODO: do not use hardcoded strings for filter status
 		if (filterStatus === 'completed' && !task.completed) {
 			return false;
 		}
