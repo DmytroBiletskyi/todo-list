@@ -11,7 +11,8 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ taskId, index, columnId }: TaskCardProps) {
-	const { state, deleteTask, toggleTask, editTask, selectedTaskIds, toggleTaskSelection } = useBoardContext();
+	const { state, deleteTask, toggleTask, editTask, selectedTaskIds, toggleTaskSelection, searchQuery } =
+		useBoardContext();
 	const task = state.tasks[taskId];
 
 	const [isEditing, setIsEditing] = useState(false);
@@ -54,6 +55,25 @@ export function TaskCard({ taskId, index, columnId }: TaskCardProps) {
 	}, [taskId, columnId, index]);
 
 	const isSelected = selectedTaskIds.has(taskId);
+
+	const highlightSearchText = (text: string, query: string) => {
+		if (!query.trim()) {
+			return text;
+		}
+
+		const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+		const parts = text.split(regex);
+
+		return parts.map((part, index) =>
+			regex.test(part) ? (
+				<span key={index} className={styles.highlight}>
+					{part}
+				</span>
+			) : (
+				part
+			)
+		);
+	};
 
 	if (!task) {
 		return null;
@@ -119,24 +139,31 @@ export function TaskCard({ taskId, index, columnId }: TaskCardProps) {
 					/>
 				) : (
 					<span className={styles.text} onDoubleClick={handleStartEdit} title="Double-click to edit">
-						{task.text}
+						{highlightSearchText(task.text, searchQuery)}
 					</span>
 				)}
 			</div>
 
-			<div className={styles.right}>
-				<button className={styles.actionBtn} onClick={handleStartEdit} title="Edit task" aria-label="Edit task">
-					✏️
-				</button>
-				<button
-					className={styles.actionBtn}
-					onClick={() => deleteTask(taskId)}
-					title="Delete task"
-					aria-label="Delete task"
-				>
-					✕
-				</button>
-			</div>
+			{isEditing ? null : (
+				<div className={styles.right}>
+					<button
+						className={styles.actionBtn}
+						onClick={handleStartEdit}
+						title="Edit task"
+						aria-label="Edit task"
+					>
+						✏️
+					</button>
+					<button
+						className={styles.actionBtn}
+						onClick={() => deleteTask(taskId)}
+						title="Delete task"
+						aria-label="Delete task"
+					>
+						✕
+					</button>
+				</div>
+			)}
 		</div>
 	);
 }
