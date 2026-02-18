@@ -2,7 +2,7 @@
 
 Kanban-style task management app built with React + TypeScript + Vite.
 
-**Live demo:** https://todo-list-3feorn2kj-dmytros-projects-b07917bd.vercel.app/
+**Live demo:** [https://todo-list-3feorn2kj-dmytros-projects-b07917bd.vercel.app/](https://todo-list-three-swart-82.vercel.app/)
 
 ## Tech Stack
 
