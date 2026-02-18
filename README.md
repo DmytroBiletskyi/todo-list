@@ -2,6 +2,8 @@
 
 Kanban-style task management app built with React + TypeScript + Vite.
 
+**Live demo:** https://todo-list-kgcktwni9-dmytros-projects-b07917bd.vercel.app/
+
 ## Tech Stack
 
 - React 19 + TypeScript
@@ -58,11 +60,13 @@ npm run format:check
 - Add, edit, delete tasks and columns
 - Drag and drop tasks between columns and reorder within column
 - Drag and drop to reorder columns
+- Multi-drag: select multiple tasks and drag them all at once to a new column or position
 - Mark tasks as complete / incomplete
 - Multi-select tasks with checkboxes
 - Select All in a column
 - Bulk actions: complete, incomplete, move to column, delete
-- Search tasks by name
+- Search tasks by name with fuzzy matching (Levenshtein distance)
+- Search term highlighting in task cards
 - Filter tasks by completion status (All / Active / Completed)
 - Inline editing of task text and column title (double-click)
 - Persistent state via localStorage

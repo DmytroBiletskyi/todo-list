@@ -6,7 +6,7 @@ import { AddColumnForm } from '../AddColumnForm/AddColumnForm';
 import styles from './Board.module.css';
 
 export function Board() {
-	const { state, moveTaskToColumn, reorderTask, reorderColumn } = useBoardContext();
+	const { state, moveTaskToColumn, reorderTask, reorderColumn, selectedTaskIds, bulkMoveTasks } = useBoardContext();
 
 	useEffect(() => {
 		return monitorForElements({
@@ -28,15 +28,31 @@ export function Board() {
 						const destColumnId = destData.columnId as string;
 						const destIndex = destData.index as number;
 
-						if (sourceColumnId === destColumnId) {
-							reorderTask(sourceColumnId, sourceIndex, destIndex);
+						if (selectedTaskIds.size > 1) {
+							const tasksToMove = Array.from(selectedTaskIds);
+							if (tasksToMove.length > 0) {
+								bulkMoveTasks(tasksToMove, destColumnId, destIndex);
+							}
 						} else {
-							moveTaskToColumn(taskId, destColumnId, destIndex);
+							if (sourceColumnId === destColumnId) {
+								reorderTask(sourceColumnId, sourceIndex, destIndex);
+							} else {
+								moveTaskToColumn(taskId, destColumnId, destIndex);
+							}
 						}
 					} else if (destData.type === 'column') {
 						const destColumnId = destData.columnId as string;
-						if (sourceColumnId !== destColumnId) {
-							moveTaskToColumn(taskId, destColumnId);
+						if (selectedTaskIds.size > 0) {
+							const tasksToMove = Array.from(selectedTaskIds).filter(
+								(id) => state.tasks[id].columnId !== destColumnId
+							);
+							if (tasksToMove.length > 0) {
+								bulkMoveTasks(tasksToMove, destColumnId);
+							}
+						} else {
+							if (sourceColumnId !== destColumnId) {
+								moveTaskToColumn(taskId, destColumnId);
+							}
 						}
 					}
 				}
@@ -50,7 +66,7 @@ export function Board() {
 				}
 			}
 		});
-	}, [moveTaskToColumn, reorderTask, reorderColumn]);
+	}, [moveTaskToColumn, reorderTask, reorderColumn, selectedTaskIds, bulkMoveTasks, state.tasks]);
 
 	return (
 		<div className={styles.board}>

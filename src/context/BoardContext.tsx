@@ -31,7 +31,7 @@ interface BoardContextType {
 
 	bulkDeleteTasks: (taskIds: string[]) => void;
 	bulkToggleTasks: (taskIds: string[], completed: boolean) => void;
-	bulkMoveTasks: (taskIds: string[], targetColumnId: string) => void;
+	bulkMoveTasks: (taskIds: string[], targetColumnId: string, targetIndex?: number) => void;
 }
 
 const BoardContext = createContext<BoardContextType | null>(null);
@@ -389,14 +389,14 @@ export function BoardProvider({ children }: { children: React.ReactNode }) {
 	);
 
 	const bulkMoveTasks = useCallback(
-		(taskIds: string[], targetColumnId: string) => {
+		(taskIds: string[], targetColumnId: string, targetIndex?: number) => {
 			setState((prev) => {
 				const updatedTasks = { ...prev.tasks };
 				const updatedColumns = { ...prev.columns };
 
 				for (const taskId of taskIds) {
 					const task = updatedTasks[taskId];
-					if (!task || task.columnId === targetColumnId) {
+					if (!task) {
 						continue;
 					}
 
@@ -404,13 +404,20 @@ export function BoardProvider({ children }: { children: React.ReactNode }) {
 						...updatedColumns[task.columnId],
 						taskIds: updatedColumns[task.columnId].taskIds.filter((id) => id !== taskId)
 					};
+				}
 
-					updatedColumns[targetColumnId] = {
-						...updatedColumns[targetColumnId],
-						taskIds: [...updatedColumns[targetColumnId].taskIds, taskId]
-					};
+				const targetTaskIds = [...updatedColumns[targetColumnId].taskIds];
+				const insertAt = targetIndex !== undefined ? targetIndex : targetTaskIds.length;
+				targetTaskIds.splice(insertAt, 0, ...taskIds);
+				updatedColumns[targetColumnId] = {
+					...updatedColumns[targetColumnId],
+					taskIds: targetTaskIds
+				};
 
-					updatedTasks[taskId] = { ...task, columnId: targetColumnId };
+				for (const taskId of taskIds) {
+					if (updatedTasks[taskId]) {
+						updatedTasks[taskId] = { ...updatedTasks[taskId], columnId: targetColumnId };
+					}
 				}
 
 				return { ...prev, tasks: updatedTasks, columns: updatedColumns };
